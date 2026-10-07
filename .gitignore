@@ -1,0 +1,33 @@
+# Dependencies
+node_modules/
+venv/
+__pycache__/
+*.pyc
+
+# Build
+frontend/build/
+*.egg-info/
+
+# Environment
+.env
+.env.local
+backend/.env
+
+# Data / uploads
+data/uploads/
+data/vectorstore/
+backend/data/uploads/
+backend/data/vectorstore/
+backend/logs/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Test / cache
+.pytest_cache/
+coverage/

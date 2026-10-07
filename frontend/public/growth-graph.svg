@@ -1,0 +1,86 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 300" width="420" height="300" role="img" aria-label="Business growth chart showing quarterly revenue rising from 28 to 82 million dollars with year-over-year growth">
+  <defs>
+    <linearGradient id="barFill" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#60a5fa" />
+      <stop offset="100%" stop-color="#2563eb" />
+    </linearGradient>
+    <linearGradient id="barFillMuted" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#dbeafe" />
+      <stop offset="100%" stop-color="#bfdbfe" />
+    </linearGradient>
+  </defs>
+
+  <!-- Card -->
+  <rect x="0.5" y="0.5" width="419" height="299" rx="14" fill="#ffffff" stroke="#e5e7eb" />
+
+  <!-- Title -->
+  <text x="20" y="32" font-family="Inter, Segoe UI, Helvetica, Arial, sans-serif" font-size="14" font-weight="600" fill="#111827">Business Growth</text>
+  <text x="20" y="48" font-family="Inter, Segoe UI, Helvetica, Arial, sans-serif" font-size="10" fill="#9ca3af">Quarterly revenue vs. year-over-year growth</text>
+
+  <!-- YoY badge -->
+  <rect x="326" y="20" width="74" height="22" rx="11" fill="#ecfdf5" />
+  <text x="363" y="35" text-anchor="middle" font-family="Inter, Segoe UI, Helvetica, Arial, sans-serif" font-size="10" font-weight="600" fill="#065f46">+34% YoY</text>
+
+  <!-- Gridlines -->
+  <line x1="44" y1="232" x2="404" y2="232" stroke="#e5e7eb" />
+  <line x1="44" y1="182" x2="404" y2="182" stroke="#f3f4f6" />
+  <line x1="44" y1="132" x2="404" y2="132" stroke="#f3f4f6" />
+  <line x1="44" y1="82" x2="404" y2="82" stroke="#f3f4f6" />
+
+  <!-- Y axis labels -->
+  <g font-family="Inter, Segoe UI, Helvetica, Arial, sans-serif" font-size="8" fill="#9ca3af" text-anchor="end">
+    <text x="38" y="235">0</text>
+    <text x="38" y="185">25</text>
+    <text x="38" y="135">50</text>
+    <text x="38" y="85">75</text>
+  </g>
+
+  <!-- Bars: 28, 33, 39, 45, 53, 60, 70, 82 -->
+  <g>
+    <rect x="57" y="176" width="26" height="56" rx="4" fill="url(#barFillMuted)" />
+    <rect x="101" y="166" width="26" height="66" rx="4" fill="url(#barFillMuted)" />
+    <rect x="145" y="154" width="26" height="78" rx="4" fill="url(#barFillMuted)" />
+    <rect x="189" y="142" width="26" height="90" rx="4" fill="url(#barFillMuted)" />
+    <rect x="233" y="126" width="26" height="106" rx="4" fill="url(#barFill)" />
+    <rect x="277" y="112" width="26" height="120" rx="4" fill="url(#barFill)" />
+    <rect x="321" y="92" width="26" height="140" rx="4" fill="url(#barFill)" />
+    <rect x="365" y="68" width="26" height="164" rx="4" fill="url(#barFill)" />
+  </g>
+
+  <!-- Growth line -->
+  <polyline points="70,150 114,144 158,137 202,127 246,116 290,103 334,93 378,78" fill="none" stroke="#ffffff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" />
+  <polyline points="70,150 114,144 158,137 202,127 246,116 290,103 334,93 378,78" fill="none" stroke="#8b5cf6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+  <g fill="#ffffff" stroke="#8b5cf6" stroke-width="1.5">
+    <circle cx="70" cy="150" r="3" />
+    <circle cx="114" cy="144" r="3" />
+    <circle cx="158" cy="137" r="3" />
+    <circle cx="202" cy="127" r="3" />
+    <circle cx="246" cy="116" r="3" />
+    <circle cx="290" cy="103" r="3" />
+    <circle cx="334" cy="93" r="3" />
+    <circle cx="378" cy="78" r="3.5" />
+  </g>
+
+  <!-- X axis labels -->
+  <g font-family="Inter, Segoe UI, Helvetica, Arial, sans-serif" font-size="8" fill="#9ca3af" text-anchor="middle">
+    <text x="70" y="246">Q1</text>
+    <text x="114" y="246">Q2</text>
+    <text x="158" y="246">Q3</text>
+    <text x="202" y="246">Q4</text>
+    <text x="246" y="246">Q1</text>
+    <text x="290" y="246">Q2</text>
+    <text x="334" y="246">Q3</text>
+    <text x="378" y="246">Q4</text>
+  </g>
+  <text x="136" y="260" text-anchor="middle" font-family="Inter, Segoe UI, Helvetica, Arial, sans-serif" font-size="8" fill="#c3c6cb">FY24</text>
+  <text x="312" y="260" text-anchor="middle" font-family="Inter, Segoe UI, Helvetica, Arial, sans-serif" font-size="8" fill="#c3c6cb">FY25</text>
+
+  <!-- Legend -->
+  <g font-family="Inter, Segoe UI, Helvetica, Arial, sans-serif" font-size="9" fill="#6b7280">
+    <rect x="20" y="272" width="9" height="9" rx="2" fill="url(#barFill)" />
+    <text x="34" y="280">Revenue ($M)</text>
+    <line x1="128" y1="276.5" x2="142" y2="276.5" stroke="#8b5cf6" stroke-width="2" stroke-linecap="round" />
+    <circle cx="135" cy="276.5" r="2.5" fill="#ffffff" stroke="#8b5cf6" stroke-width="1.5" />
+    <text x="148" y="280">YoY growth</text>
+  </g>
+</svg>

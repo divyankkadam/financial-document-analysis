@@ -1,0 +1,341 @@
+FINANCIAL REPORT ANALYST - INTERVIEW QUESTIONS AND ANSWERS
+
+
+1. Can You Explain Your Project In Brief?
+My project is a Financial Report Analyst, an AI-powered web application that analyzes annual reports and financial PDFs. Users can upload multiple
+reports and ask questions like revenue trends, risk factors, profit margins, or segment performance. The system uses RAG, GraphRAG, CRAG, and Self-
+RAG to retrieve relevant content, verify answer quality, and return source-backed answers with confidence scores.
+
+2. What Was Your Exact Role And Contribution?
+I worked on the complete full-stack implementation. I built the FastAPI backend, PDF parsing pipeline, document chunking, Neo4j-based vector/graph
+storage, LangGraph query pipeline, and React frontend. I also implemented automatic document routing, streaming chat responses, evaluation metrics,
+conversation history, and Docker-based setup.
+
+
+3. Why Did You Choose This Technology Stack?
+I used Python and FastAPI because Python has strong AI, NLP, and PDF-processing libraries, and FastAPI is lightweight, fast, and easy to expose APIs with.
+I used React because it is suitable for building interactive chat, upload, and dashboard interfaces.
+I chose Neo4j instead of a traditional SQL database because financial reports are naturally connected data: documents have pages, sections, chunks, tables, metrics, periods, and statements. Neo4j also supports vector search, so it fits both semantic retrieval and graph relationships. SQL could store metadata, but graph traversal and chunk relationships are easier in Neo4j.
+
+4. How Is The System Designed?
+The system has three main layers:
+
+- Frontend: React app for uploading PDFs, asking questions, viewing answers, sources, and confidence metrics.
+- Backend: FastAPI server that handles upload, query, document registry, evaluation, and streaming responses.
+- Data/AI Layer: Neo4j stores document structure and embeddings; LangGraph controls the RAG pipeline.
+
+The query pipeline is:
+
+Doc Router -> Retriever -> CRAG -> Reasoning -> Self-RAG -> Final Answer
+
+5. How Does Data Flow Through The Application?
+First, the user uploads PDFs from the React UI. The backend saves the file, extracts text and tables using PyMuPDF/pdfplumber, chunks the content,
+generates embeddings, and stores everything in Neo4j.
+
+When the user asks a question, the backend auto-selects the most relevant document, retrieves matching chunks from Neo4j, filters them through CRAG,
+generates an answer using the LLM, validates it using Self-RAG, and streams the final answer back to the frontend with sources and confidence.
+
+6. How Is Your Database Structured?
+The database is structured as a graph in Neo4j.
+
+Main nodes are:
+
+- Document
+- Page
+- Section
+- Chunk
+- FinancialTable
+- TableRow
+- TableCell
+- Metric
+- Period
+- Statement
+
+Relationships include:
+
+- Document -> HAS_PAGE -> Page
+- Document -> HAS_SECTION -> Section
+- Section -> HAS_CHUNK -> Chunk
+- Page -> HAS_TABLE -> FinancialTable
+- FinancialTable -> HAS_ROW -> TableRow
+- TableRow -> HAS_CELL -> TableCell
+- Metric -> MENTIONED_IN -> Chunk
+- Chunk -> FOR_PERIOD -> Period
+
+This helps the system search semantically while still preserving financial-report structure.
+
+7. Is Your Project Scalable?
+Yes, the design is scalable because the frontend, backend, and database are separated. If traffic increases, the FastAPI backend can be horizontally
+scaled, Neo4j can be moved to a managed/cloud instance, and embeddings can be generated asynchronously using background workers. For larger document
+volumes, I would add job queues, caching, pagination, rate limiting, and separate storage like S3 for uploaded PDFs.
+
+8. Biggest Technical Challenge And Resolution
+The biggest challenge was getting accurate answers from large multi-document financial PDFs. A simple RAG pipeline sometimes retrieved irrelevant
+chunks or answered from the wrong document.
+
+I solved this by adding an automatic Doc Router before retrieval, then adding CRAG to filter weak retrieval results and Self-RAG to evaluate
+groundedness, relevance, completeness, and confidence before finalizing the answer. This made the answers more reliable and easier to verify.
+
+9. How Did You Handle Errors And Security?
+I added validation for uploads, such as accepting only PDFs and limiting file size to 50 MB. The backend returns proper HTTP errors for invalid files, missing documents, and failed processing. Secrets like API keys and database credentials are kept in environment variables. 
+
+Neo4j queries use parameters instead of unsafe string inputs. CORS is configured for frontend access.
+
+Currently, the project does not include full user authentication. In production, I would add JWT-based login, role-based access, stronger file scanning, rate limiting, and stricter upload isolation.
+
+10. How Did You Test Your Project?
+I tested manually through the UI by uploading PDFs, asking financial questions, and checking answer quality, sources, and confidence. I also wrote unit tests for chunking, CRAG behavior, Self-RAG behavior, answer formatting, routing logic, memory sessions, and evaluation statistics. API endpoints can also be tested using Postman or FastAPI Swagger docs.
+
+11. Where And How Is The Project Hosted/Deployed?
+The project supports Docker-based deployment using Docker Compose for the frontend, FastAPI backend, and Neo4j database. The backend has Render deployment configuration, and the frontend has Vercel configuration. In production, the frontend can run on Vercel, the backend on Render, and Neo4j on a managed Neo4j cloud service.
+
+
+CORE QUESTIONS
+
+1. Why did you choose this project?
+I chose this project because financial reports are long, complex, and time-consuming to analyze manually. I wanted to build a practical AI system that could help users quickly extract reliable financial insights from annual reports.
+
+2. What real-world problem does it solve?
+It solves the problem of manually reading and comparing large financial PDFs. Instead of searching through hundreds of pages, users can upload reports and ask questions in natural language to get source-backed answers.
+
+3. Who are the target users?
+The target users are financial analysts, investors, researchers, auditors, and business students who need to understand company reports, financial trends, risks, and performance metrics quickly.
+
+4. What was your exact contribution?
+I worked on the full-stack development of the project. I built the FastAPI backend, PDF parsing and chunking pipeline, Neo4j vector/graph storage, LangGraph RAG pipeline, React frontend, streaming chat, dashboard, evaluation metrics, and Docker setup.
+
+5. What makes your project different from a normal chatbot?
+A normal chatbot may answer from general knowledge and can hallucinate. My project answers only from uploaded financial reports. It retrieves relevant chunks, verifies answer quality using CRAG and Self-RAG, shows sources, and provides confidence metrics.
+
+6. What is the most important feature of your project?
+The most important feature is reliable, source-backed financial question answering. The system automatically selects the right document, retrieves relevant evidence, checks answer quality, and returns an answer with sources and confidence scores.
+
+
+ARCHITECTURE QUESTIONS
+
+1. Can you explain the complete system architecture?
+The project follows a three-layer architecture: React frontend, FastAPI backend, and Neo4j database. The frontend handles PDF upload, chat, source display, and dashboard. The backend handles APIs, PDF processing, RAG pipeline execution, and evaluation. Neo4j stores document structure, chunks, embeddings, tables, metrics, and relationships for GraphRAG-based retrieval.
+
+2. How does data flow from PDF upload to final answer?
+First, the user uploads a PDF from the React UI. The FastAPI backend saves the file, extracts text and tables using PyMuPDF and pdfplumber, chunks the content by financial sections, generates embeddings, and stores everything in Neo4j. When the user asks a question, the backend selects the most relevant document, retrieves matching chunks, filters them through CRAG, generates an answer, checks it using Self-RAG, and sends the final answer back with sources and confidence.
+
+3. Why did you use a separate frontend, backend, and database?
+I separated them to keep responsibilities clear. React manages the user interface, FastAPI manages business logic and AI pipeline execution, and Neo4j manages storage and retrieval. This makes the system easier to maintain, test, scale, and deploy independently.
+
+4. What happens internally when a user asks a question?
+The question is sent from React to the FastAPI query API. The backend first classifies whether the query is simple or complex. Then the Doc Router selects the best document using embeddings and LLM re-ranking. The Retriever fetches relevant chunks from Neo4j. CRAG checks the quality of retrieved chunks. The Reasoning Node generates a draft answer. Self-RAG evaluates the answer for relevance, groundedness, completeness, and confidence. Finally, the Answer Node returns the response with sources, searched documents, and confidence score.
+
+5. How does the streaming response work?
+The frontend calls the backend streaming query endpoint. The backend uses Server-Sent Events to send progress updates like document routing, retrieval, decomposition, and answer generation. Once the pipeline finishes, the final answer payload is streamed back to the React chat UI and displayed with sources and evaluation badges.
+
+
+RAG / AI QUESTIONS
+
+1. What is RAG?
+RAG means Retrieval-Augmented Generation. Instead of asking the LLM to answer only from its training data, we first retrieve relevant content from uploaded financial reports, then give that content to the LLM to generate a grounded answer.
+
+2. What is GraphRAG, and why did you use it?
+GraphRAG combines retrieval with a graph database. I used Neo4j to store relationships like Document -> Section -> Chunk, pages, tables, metrics, and periods. This is useful because financial reports are structured and connected, not just plain text.
+
+3. What is CRAG?
+CRAG means Corrective RAG. In my project, after retrieval, CRAG checks whether the retrieved chunks are relevant enough. If the quality is low, the system retries or filters weak chunks before generating the answer.
+
+4. What is Self-RAG?
+Self-RAG is a self-evaluation step after generating the draft answer. It checks the answer on relevance, groundedness, completeness, and confidence. If the answer is weak, it can refine the answer or trigger another retrieval attempt.
+
+5. How do you prevent hallucination?
+I prevent hallucination by forcing the LLM to answer only from retrieved report chunks. I also use CRAG to remove weak retrieval results, Self-RAG to verify groundedness, and source attribution so users can see which document sections support the answer.
+
+6. How does your system choose the correct document?
+The system uses a Doc Router. First, it compares the user query with document previews using embedding similarity. Then an LLM re-ranks the shortlisted documents and selects the most relevant one or two reports.
+
+7. How are embeddings generated?
+When a PDF is uploaded, the text is split into chunks. Each chunk is converted into a numerical vector using a HuggingFace embedding model. These embeddings are stored in Neo4j and later compared with the user query embedding during search.
+
+8. How do you decide chunk size and overlap?
+I used a chunk size of around 800 characters with 150 characters overlap. This keeps each chunk large enough to preserve financial context, while the overlap prevents important information from being lost between chunk boundaries.
+
+9. What happens if retrieval returns irrelevant chunks?
+CRAG evaluates the retrieved chunks using retrieval scores. Low-quality chunks are filtered out. If the average quality is too low, the system can retry retrieval instead of directly generating an answer from poor context.
+
+10. How is confidence calculated?
+Confidence comes mainly from the Self-RAG evaluation. The generated answer is scored on relevance, groundedness, completeness, and confidence. The final confidence score is based on the overall evaluation score returned by this self-checking step.
+
+
+DATABASE QUESTIONS
+
+1. Why did you choose Neo4j instead of SQL?
+I chose Neo4j because this project needs both vector search and relationship-based document modeling. Financial reports are connected data: documents contain pages, sections, chunks, tables, metrics, periods, and statements. A SQL database could store this, but graph traversal is more natural in Neo4j. Neo4j also supports vector indexes, which makes it useful for semantic search in RAG.
+
+2. How is your Neo4j database structured?
+The database is structured as a graph. The main nodes are Document, Page, Section, Chunk, FinancialTable, TableRow, TableCell, Metric, Period, and Statement.
+
+The main relationships are:
+Document -> HAS_PAGE -> Page
+Document -> HAS_SECTION -> Section
+Section -> HAS_CHUNK -> Chunk
+Page -> HAS_TABLE -> FinancialTable
+FinancialTable -> HAS_ROW -> TableRow
+TableRow -> HAS_CELL -> TableCell
+Metric -> MENTIONED_IN -> Chunk
+Chunk -> FOR_PERIOD -> Period
+Chunk -> PART_OF_STATEMENT -> Statement
+
+3. What are the main nodes and relationships?
+The main node is Document, which represents an uploaded financial report. Each document connects to pages and sections. Sections connect to text chunks. Pages connect to tables, rows, and cells. Chunks can also connect to financial metrics, reporting periods, and financial statements. This structure helps retrieve both semantic text and financial context.
+
+4. How are document chunks stored?
+Each text chunk is stored as a Chunk node in Neo4j. It contains the chunk text, embedding vector, document ID, file name, section name, page number, chunk index, and character count. The chunk is linked back to its section and page, so the system can provide source attribution.
+
+5. How is vector search performed?
+When a user asks a question, the system generates an embedding for the query. Neo4j's vector index compares that query embedding with stored chunk embeddings using similarity search. The top matching chunks are returned to the RAG pipeline for filtering and answer generation.
+
+6. Could you replace Neo4j with PostgreSQL or Pinecone?
+Yes, but with trade-offs. PostgreSQL with pgvector could handle relational metadata and vector search, but graph traversal would be less natural. Pinecone would be strong for vector search, but it would not easily model pages, sections, tables, metrics, and relationships. Neo4j was a good fit because it supports both graph relationships and vector retrieval in one system.
+
+
+FRONTEND QUESTIONS
+
+1. Why did you use React?
+I used React because the project needed an interactive UI with file uploads, live chat, status updates, conversation history, and dashboards. React's component-based structure made it easier to split the UI into reusable parts like UploadPanel, ChatPanel, DocSelector, and Dashboard.
+
+2. What features are available in the UI?
+The UI supports multi-PDF upload, document listing, AI chat, streaming progress updates, conversation history, source badges, confidence/evaluation badges, and an analytics dashboard. The dashboard shows total documents, total queries, average confidence, response time, and recent query trends.
+
+3. How does the chat interface work?
+The user types a financial question in the chat box. The React app sends the question and session ID to the backend streaming API. While the backend processes the request, the UI shows live status messages. When the final answer arrives, it displays the answer, searched documents, sources, confidence score, and evaluation details.
+
+4. How do you show sources and confidence?
+The backend returns the final answer with metadata such as source section, page number, searched document, confidence score, and evaluation metrics. The frontend displays this using source badges and evaluation badges, so the user can verify where the answer came from and how reliable it is.
+
+5. How is conversation history stored?
+Conversation history is stored on the frontend using localStorage. Each conversation has its own session ID, title, messages, creation time, and update time. This allows users to switch between previous chats without losing their context.
+
+
+BACKEND QUESTIONS
+
+1. Why did you use FastAPI?
+I used FastAPI because it is fast, lightweight, and well-suited for AI APIs. It supports async endpoints, request validation with Pydantic, file uploads, streaming responses, and automatic Swagger documentation.
+
+2. What APIs did you create?
+I created APIs for PDF upload, batch PDF upload, list documents, get document details, delete documents, re-index documents, ask questions, stream query responses, view evaluation stats, view recent runs, view session history, and clear session.
+
+3. How do you handle PDF upload?
+The frontend sends PDFs using multipart form data. The backend validates that the file is a PDF and checks the file size limit. Then it saves the file, parses text and tables, chunks the content, creates embeddings, stores the document structure in Neo4j, and updates the document registry.
+
+4. How do you parse tables from PDFs?
+I used pdfplumber to extract tables from each PDF page. The extracted tables are stored in Neo4j as FinancialTable, TableRow, and TableCell nodes. This helps preserve financial table structure instead of treating everything as plain text.
+
+5. How do you manage multiple documents?
+Each uploaded document gets a unique doc_id generated from the file hash. Metadata is stored in a document registry, and the document content is indexed in Neo4j. During querying, the Doc Router automatically selects the most relevant document or documents based on embedding similarity and LLM re-ranking.
+
+6. How do you store document metadata?
+Document metadata such as file name, file path, total pages, title, author, subject, keywords, preview text, chunk count, and indexing status is stored in a JSON document registry. The same document structure is also stored in Neo4j with related pages, sections, chunks, tables, metrics, and periods.
+
+
+SCALABILITY QUESTIONS
+
+1. Is your project scalable?
+Yes. The project has a separated architecture: React frontend, FastAPI backend, and Neo4j database. Each layer can be scaled independently. The backend can run multiple instances, Neo4j can be moved to a managed cluster, and file storage can be moved to cloud storage like S3.
+
+2. What if 100 users upload large PDFs at the same time?
+Currently, uploads are processed synchronously, so heavy traffic could slow the backend. To scale this, I would move PDF parsing, chunking, and embedding generation to background workers using Celery/RQ and a queue like Redis. The API would immediately return an upload/job ID, and workers would process documents asynchronously.
+
+3. How would you improve performance?
+I would add caching for repeated queries, background processing for uploads, pagination for document lists, batch embedding generation, and optimized Neo4j indexes. I would also separate file storage from the backend and monitor latency, confidence, and retrieval quality.
+
+4. How would you handle millions of document chunks?
+For millions of chunks, I would use managed Neo4j clustering or a dedicated vector database like Pinecone/Weaviate for embeddings. I would shard by document, company, and year, archive old documents, and use metadata filters before vector search to reduce the search space.
+
+5. Would you use caching or queues?
+Yes. I would use queues for long-running jobs like PDF parsing and embedding generation. I would use caching for repeated queries, document metadata, embeddings, and frequently accessed dashboard stats.
+
+
+SECURITY AND ERROR HANDLING
+
+1. How do you validate uploaded files?
+The backend accepts only PDF files and checks the file size limit, currently 50 MB. Invalid files return proper HTTP errors.
+
+2. What security risks exist in PDF uploads?
+PDFs can contain malicious content, huge files, or corrupted data. In production, I would add virus scanning, file type validation using MIME detection, sandboxed PDF parsing, upload rate limits, and isolated cloud storage.
+
+3. Where do you store API keys?
+API keys and database credentials are stored in environment variables, not hardcoded in the application code.
+
+4. How do you prevent unauthorized access?
+Currently, the project is mainly a prototype and does not include full authentication. For production, I would add JWT-based authentication, role-based access control, protected API routes, user-specific document access, and HTTPS.
+
+5. What errors can occur, and how do you handle them?
+Possible errors include invalid file type, oversized PDF, parsing failure, missing document, Neo4j connection failure, embedding failure, or LLM API failure. The backend handles these with HTTP exceptions, try-catch blocks, logging, and fallback logic in some AI steps.
+
+
+TESTING AND DEPLOYMENT
+
+1. How did you test this project?
+I tested it manually through the frontend by uploading PDFs, asking financial questions, checking streamed responses, sources, and confidence scores. I also tested backend APIs and wrote unit tests for important pipeline components.
+
+2. What unit tests did you write?
+I wrote tests for chunk generation, section detection, CRAG handling of empty results, Self-RAG handling of missing draft answers, answer formatting with sources, routing decisions, memory session lifecycle, and evaluator statistics.
+
+3. Did you test APIs using Postman or Swagger?
+Yes, the APIs can be tested using FastAPI's built-in Swagger documentation. Endpoints like upload, query, stream query, documents, and evaluation stats can also be tested using Postman.
+
+4. How is the project deployed?
+The project supports Docker Compose for local deployment with three services: frontend, backend, and Neo4j. It also includes configuration for deploying the backend on Render and the frontend on Vercel.
+
+5. Why did you use Docker Compose?
+I used Docker Compose because the project depends on multiple services. It starts React, FastAPI, and Neo4j together with the correct ports, environment variables, and volumes, making setup easier and consistent across machines.
+
+6. How would you deploy it in production?
+I would deploy the frontend on Vercel, the backend on Render or AWS, store uploaded PDFs in S3, and use managed Neo4j Aura for the database. I would also add CI/CD, environment-based configs, monitoring, HTTPS, authentication, and background workers for PDF processing.
+
+
+CHALLENGE-BASED QUESTIONS
+
+1. What was the biggest technical challenge?
+The biggest challenge was getting accurate answers from large, multi-document financial PDFs. A normal RAG pipeline could retrieve irrelevant chunks or select the wrong report, which could lead to incorrect financial answers.
+
+2. How did you solve wrong document retrieval?
+I added a Doc Router before retrieval. It first shortlists documents using embedding similarity, then uses an LLM to re-rank and select the most relevant document or documents. This reduced noise and helped the system search in the correct report.
+
+3. How did you reduce hallucination?
+I reduced hallucination by making the LLM answer only from retrieved report chunks. I also added CRAG to filter weak retrieval results and Self-RAG to check relevance, groundedness, completeness, and confidence before returning the final answer.
+
+4. What was the hardest bug you fixed?
+One hard issue was when the system returned "no index found" or weak answers after uploading documents. I fixed it by making ingestion run immediately after upload: parse the PDF, chunk it, generate embeddings, store chunks in Neo4j, and update the document registry with indexing status.
+
+5. What would you improve if you had more time?
+I would add user authentication, background job processing for large PDFs, cloud file storage, stronger PDF security scanning, caching for repeated queries, and more advanced financial table reasoning. I would also add better evaluation datasets to measure answer accuracy more formally.
+
+
+HIGH-PROBABILITY QUESTIONS
+
+1. Explain RAG, CRAG, and Self-RAG.
+RAG retrieves relevant report chunks before generating an answer, so the LLM answers from uploaded documents instead of only its training data. CRAG checks the quality of retrieved chunks and filters or retries when retrieval is weak. Self-RAG evaluates the draft answer for relevance, groundedness, completeness, and confidence before final output.
+
+2. Why Neo4j instead of SQL?
+I used Neo4j because financial reports have connected structure: documents, pages, sections, chunks, tables, metrics, periods, and statements. Neo4j models these relationships naturally and also supports vector search. SQL could store metadata, but graph traversal and semantic retrieval are easier in Neo4j.
+
+3. Explain your full data flow.
+The user uploads PDFs from React. FastAPI saves and parses them using PyMuPDF and pdfplumber, chunks the text, creates embeddings, and stores everything in Neo4j. When the user asks a question, the backend routes to the right document, retrieves chunks, filters them with CRAG, generates an answer, validates it with Self-RAG, and returns the answer with sources and confidence.
+
+4. How do you prevent hallucination?
+The LLM is instructed to answer only from retrieved chunks. CRAG filters irrelevant chunks before answering, Self-RAG checks whether the answer is grounded in the context, and the final response includes source sections and page references for verification.
+
+5. What was your exact role?
+I worked on the full-stack implementation: FastAPI backend, PDF parsing, chunking, embeddings, Neo4j graph/vector storage, LangGraph RAG pipeline, React frontend, streaming chat, dashboard, evaluation metrics, tests, and Docker setup.
+
+6. What was the biggest challenge?
+The biggest challenge was accurate retrieval from large multi-document reports. Basic RAG could search the wrong document or return weak chunks. I solved this using automatic document routing, CRAG-based retrieval filtering, and Self-RAG answer validation.
+
+7. How is your project scalable?
+The frontend, backend, and database are separated, so each layer can scale independently. For heavier load, I would add background workers for PDF ingestion, Redis queues, cloud file storage, caching, and managed Neo4j or a dedicated vector database.
+
+8. How did you test it?
+I tested manually through the UI and APIs, and I wrote unit tests for chunking, section detection, CRAG, Self-RAG, answer formatting, routing logic, memory sessions, and evaluator statistics.
+
+9. How is the database structured?
+Neo4j stores nodes such as Document, Page, Section, Chunk, FinancialTable, Metric, Period, and Statement. Relationships connect documents to pages, sections, chunks, tables, metrics, and periods. Chunk nodes also store embeddings for vector search.
+
+10. What improvements would you make next?
+I would add authentication, role-based document access, background processing for large PDFs, cloud file storage, caching, better table reasoning, stronger security scanning, and a formal evaluation dataset for measuring answer accuracy.
